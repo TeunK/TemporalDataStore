@@ -47,7 +47,10 @@ namespace Timeline.Operations
             try
             {
                 var id = new Identifier(Convert.ToUInt32(properties[1]));
-                var timestamp = new Timestamp(Convert.ToUInt64(properties[2]));
+
+                Timestamp timestamp = null;
+                if (properties.Count == 3)
+                    timestamp = new Timestamp(Convert.ToUInt64(properties[2]));
 
                 return GetDeleteOperation(id, timestamp);
             }

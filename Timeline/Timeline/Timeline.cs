@@ -28,18 +28,32 @@ namespace Timeline
         {
             if (Data.ContainsKey(id))
             {
-                if (Data[id][timestamp] == null)
+                if (timestamp == null)
                     Data.Remove(id);
                 else
                 {
-                    // iterating removal backwards to prevent sorting from repeatedly filling up removed gaps
-                    int indexAtCurrentTimestamp = Data[id].IndexOfKey(timestamp);
-                    for (int i=Data[id].Count-1; i>=indexAtCurrentTimestamp; --i)
+                    Timestamp previousObservationTimestamp = BinarySearchPreviousTimestamp(Data[id], timestamp);
+
+                    if (previousObservationTimestamp == null)
+                        return;
+
+                    if (previousObservationTimestamp.Value > 0)
                     {
-                        Data[id].RemoveAt(i);
+                        // iterating removal backward-to-front to prevent sortedList from automatically (repeatedly) filling up removed gaps in each iteration
+                        int indexAtPreviousTimestamp = Data[id].IndexOfKey(previousObservationTimestamp);
+                        for (int i = Data[id].Count - 1; i > indexAtPreviousTimestamp; --i)
+                            Data[id].RemoveAt(i);
+
+                        if (Data[id].ContainsKey(timestamp))
+                            Data[id].Remove(timestamp);
+
+                        if (Data[id].Count == 0) Data.Remove(id);
+                    }
+                    else
+                    {
+                        Data.Remove(id);
                     }
                 }
-                    
             }
             else throw new ArgumentException("id was not contained in timeline");
         }
@@ -47,12 +61,12 @@ namespace Timeline
         public ObservationResponse GetLatestObservationForId(Identifier id)
         {
             if (!Data.ContainsKey(id))
-                return new ObservationResponse(null, $"No history exists for identifier '{id}'");
+                return new ObservationResponse(null, $"No history exists for identifier '{id.Value}'");
 
             var sortedObservationsListForId = Data[id];
 
             if (sortedObservationsListForId.Count == 0)
-                return new ObservationResponse(null, $"No history exists for identifier '{id}'");
+                return new ObservationResponse(null, $"No history exists for identifier '{id.Value}'");
 
             return new ObservationResponse(Data[id].Values[Data[id].Count - 1], null);
         }
@@ -60,51 +74,63 @@ namespace Timeline
         public ObservationResponse GetPreviousObservationForId(Identifier id, Timestamp timestamp)
         {
             if (!Data.ContainsKey(id))
-                return new ObservationResponse(null, $"No history exists for identifier '{id}'");
+                return new ObservationResponse(null, $"No history exists for identifier '{id.Value}'");
             
             var sortedObservationsListForId = Data[id];
 
             if (sortedObservationsListForId.Count == 0)
-                return new ObservationResponse(null, $"No history exists for identifier '{id}'");
+                return new ObservationResponse(null, $"No history exists for identifier '{id.Value}'");
 
             if (timestamp.Value < sortedObservationsListForId.Keys[0].Value)
-                return new ObservationResponse(null, $"No history exists for identifier '{id}' before requested time '{timestamp}'");
+                return new ObservationResponse(null, $"No history exists for identifier '{id.Value}' before requested time '{timestamp.Value}'");
 
             if (timestamp.Value >= sortedObservationsListForId.Keys[sortedObservationsListForId.Count-1].Value)
                 return new ObservationResponse(sortedObservationsListForId.Values[sortedObservationsListForId.Count - 1], null);
 
-            return BinarySearchPreviousEvent(sortedObservationsListForId, timestamp);
+            return BinarySearchPreviousEventResponse(sortedObservationsListForId, timestamp);
         }
 
-        private static ObservationResponse BinarySearchPreviousEvent(SortedList<Timestamp, Observation> sortedObservationsList, Timestamp timestamp)
+        private static ObservationResponse BinarySearchPreviousEventResponse(SortedList<Timestamp, Observation> sortedObservationsList, Timestamp timestamp)
         {
-            // Binary search through timestamps
+            Timestamp previousEventTimestamp = BinarySearchPreviousTimestamp(sortedObservationsList, timestamp);
+            if (sortedObservationsList.TryGetValue(previousEventTimestamp, out Observation observation))
+                return new ObservationResponse(observation, null);
+
+            return new ObservationResponse(null, "Failed to find previously occurred event");
+        }
+
+        public static Timestamp BinarySearchPreviousTimestamp(SortedList<Timestamp, Observation> sortedObservationsList, Timestamp timestamp)
+        {
             int mid;
             int first = 0;
             int last = sortedObservationsList.Count - 1;
-            Observation result = null;
+            Timestamp result = null;
 
             while (first <= last)
             {
                 mid = (first + last) / 2;
                 Timestamp middleTimestamp = sortedObservationsList.Keys[mid];
-                Observation middleObservation = sortedObservationsList.Values[mid];
 
                 if (timestamp.Value == middleTimestamp.Value)
-                    return new ObservationResponse(middleObservation, null);
+                    return timestamp;
 
-                result = sortedObservationsList.Values[mid];
+                if (timestamp.Value < sortedObservationsList.Keys[first].Value)
+                {
+                    if (first > 0)
+                        return sortedObservationsList.Keys[first - 1];
+                    else
+                        return new Timestamp(0); //edge case, return minimum possible timestamp
+                }
+                    
+                result = sortedObservationsList.Keys[mid];
 
-                if (timestamp.Value < middleTimestamp.Value)
-                    first = mid + 1;
                 if (timestamp.Value > middleTimestamp.Value)
+                    first = mid + 1;
+                if (timestamp.Value < middleTimestamp.Value)
                     last = mid - 1;
             }
 
-            if (result != null)
-                return new ObservationResponse(result, null);
-
-            return new ObservationResponse(null, "Could not find previous observation for some reason, please check broken logic in Timeline.GetPreviousObservationForId()");
+            return result;
         }
     }
 }

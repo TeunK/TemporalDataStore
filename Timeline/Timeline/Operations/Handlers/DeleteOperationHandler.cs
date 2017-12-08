@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using Timeline.Operations.Types;
+using Timeline.Responses;
 
 namespace Timeline.Operations.Handlers
 {
@@ -17,7 +18,11 @@ namespace Timeline.Operations.Handlers
             if (!timeline.Data.ContainsKey(operation.Id))
                 return Response.ErrResponse($"Item ({operation.Id.Value}) doesn't exist.");
 
-            var currentData = timeline.GetPreviousObservationForId(operation.Id, operation.Timestamp);
+            ObservationResponse currentData;
+            if (operation.Timestamp == null)
+                currentData = timeline.GetLatestObservationForId(operation.Id);
+            else
+                currentData = timeline.GetPreviousObservationForId(operation.Id, operation.Timestamp);
 
             timeline.DeleteIdentity(operation.Id, operation.Timestamp);
 
