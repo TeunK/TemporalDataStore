@@ -22,32 +22,40 @@ namespace Timeline
             {
                 var line = Console.ReadLine();
                 var genericOperation = operationParser.ParseOperation(line);
-                if (genericOperation.Type == OperationTypes.Quit) break;
-
                 string response = null;
-                if (genericOperation.Type == OperationTypes.Create)
+
+                if (genericOperation != null)
                 {
-                    response = responseHandler.HandleCreateOperation(genericOperation, ref timeline);
-                }
-                else if (genericOperation.Type == OperationTypes.Update)
-                {
-                    response = responseHandler.HandleUpdateOperation(genericOperation, ref timeline);
-                }
-                else if (genericOperation.Type == OperationTypes.Get)
-                {
-                    response = responseHandler.HandleGetOperation(genericOperation, timeline);
-                }
-                else if (genericOperation.Type == OperationTypes.Delete)
-                {
-                    response = responseHandler.HandleDeleteOperation(genericOperation, ref timeline);
-                }
-                else if (genericOperation.Type == OperationTypes.Latest)
-                {
-                    response = responseHandler.HandleLatestOperation(genericOperation, timeline);
+                    if (genericOperation.Type == OperationTypes.Quit) break;
+
+                    if (genericOperation.Type == OperationTypes.Create)
+                    {
+                        response = responseHandler.HandleCreateOperation(genericOperation, ref timeline);
+                    }
+                    else if (genericOperation.Type == OperationTypes.Update)
+                    {
+                        response = responseHandler.HandleUpdateOperation(genericOperation, ref timeline);
+                    }
+                    else if (genericOperation.Type == OperationTypes.Get)
+                    {
+                        response = responseHandler.HandleGetOperation(genericOperation, timeline);
+                    }
+                    else if (genericOperation.Type == OperationTypes.Delete)
+                    {
+                        response = responseHandler.HandleDeleteOperation(genericOperation, ref timeline);
+                    }
+                    else if (genericOperation.Type == OperationTypes.Latest)
+                    {
+                        response = responseHandler.HandleLatestOperation(genericOperation, timeline);
+                    }
+                    else
+                    {
+                        response = responseHandler.HandleUnknownResponse();
+                    }
                 }
                 else
                 {
-                    response = responseHandler.HandleUnknownResponse();
+                    response = Response.ErrResponse("Invalid input parameters provided");
                 }
 
                 Console.WriteLine(response);

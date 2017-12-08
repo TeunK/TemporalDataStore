@@ -17,11 +17,7 @@ namespace Timeline
                 return Response.ErrResponse($"The input provided for operation ({genericOperation.Type}) was invalid");
 
             if (timeline.Data.ContainsKey(operation.Id))
-                return Response.ErrResponse($"Item ({operation.Id}) already exists");
-
-            SortedList<Timestamp, Observation> newTree = new SortedList<Timestamp, Observation> {
-                {operation.Timestamp, operation.Data}
-            };
+                return Response.ErrResponse($"Item ({operation.Id.Value}) already exists");
 
             timeline.AddNewIdentity(operation.Id, operation.Timestamp, operation.Data);
 
@@ -36,7 +32,7 @@ namespace Timeline
                 return Response.ErrResponse($"The input provided for operation ({genericOperation.Type}) was invalid");
 
             if (!timeline.Data.ContainsKey(operation.Id))
-                return Response.ErrResponse($"Item ({operation.Id}) doesn't exist.");
+                return Response.ErrResponse($"Item ({operation.Id.Value}) doesn't exist.");
 
             var currentData = timeline.GetPreviousObservationForId(operation.Id, operation.Timestamp);
 
@@ -56,7 +52,7 @@ namespace Timeline
                 return Response.ErrResponse($"The input provided for operation ({genericOperation.Type}) was invalid");
 
             if (!timeline.Data.ContainsKey(operation.Id))
-                return Response.ErrResponse($"Item ({operation.Id}) doesn't exist.");
+                return Response.ErrResponse($"Item ({operation.Id.Value}) doesn't exist.");
 
             var currentData = timeline.GetPreviousObservationForId(operation.Id, operation.Timestamp);
 
@@ -74,7 +70,7 @@ namespace Timeline
                 return Response.ErrResponse($"The input provided for operation ({genericOperation.Type}) was invalid");
 
             if (!timeline.Data.ContainsKey(operation.Id))
-                return Response.ErrResponse($"Item ({operation.Id}) doesn't exist.");
+                return Response.ErrResponse($"Item ({operation.Id.Value}) doesn't exist.");
 
             var currentData = timeline.GetPreviousObservationForId(operation.Id, operation.Timestamp);
 
@@ -94,7 +90,7 @@ namespace Timeline
                 return Response.ErrResponse($"The input provided for operation ({genericOperation.Type}) was invalid");
 
             if (!timeline.Data.ContainsKey(operation.Id))
-                return Response.ErrResponse($"Item ({operation.Id}) doesn't exist.");
+                return Response.ErrResponse($"Item ({operation.Id.Value}) doesn't exist.");
 
             var currentData = timeline.GetLatestObservationForId(operation.Id);
 

@@ -9,17 +9,17 @@ namespace Timeline
 {
     internal class Timeline
     {
-        public Dictionary<Identifier, SortedList> Data = new Dictionary<Identifier, SortedList>();
+        public Dictionary<Identifier, SortedList<Timestamp, Observation>> Data = new Dictionary<Identifier, SortedList<Timestamp, Observation>>();
 
         public void AddNewIdentity(Identifier id, Timestamp timestamp, Observation observation)
         {
-            Data.Add(id, new SortedList{{timestamp, observation}});
+            Data.Add(id, new SortedList<Timestamp, Observation> { { timestamp, observation } });
         }
 
         public void UpdateIdentity(Identifier id, Timestamp timestamp, Observation observation)
         {
             if (Data.ContainsKey(id))
-                Data[id][timestamp] = observation;
+                Data[id].Add(timestamp, observation);
             else
                 throw new ArgumentException("id was not contained in timeline");
         }
@@ -54,7 +54,7 @@ namespace Timeline
             if (sortedObservationsListForId.Count == 0)
                 return new ObservationResponse(null, $"No history exists for identifier '{id}'");
 
-            return new ObservationResponse((Observation) Data[id].GetByIndex(Data[id].Count - 1), null);
+            return new ObservationResponse(Data[id].Values[Data[id].Count - 1], null);
         }
 
         public ObservationResponse GetPreviousObservationForId(Identifier id, Timestamp timestamp)
@@ -67,13 +67,16 @@ namespace Timeline
             if (sortedObservationsListForId.Count == 0)
                 return new ObservationResponse(null, $"No history exists for identifier '{id}'");
 
-            if (timestamp.Value < (ulong)sortedObservationsListForId.GetByIndex(0))
+            if (timestamp.Value < sortedObservationsListForId.Keys[0].Value)
                 return new ObservationResponse(null, $"No history exists for identifier '{id}' before requested time '{timestamp}'");
+
+            if (timestamp.Value >= sortedObservationsListForId.Keys[sortedObservationsListForId.Count-1].Value)
+                return new ObservationResponse(sortedObservationsListForId.Values[sortedObservationsListForId.Count - 1], null);
 
             return BinarySearchPreviousEvent(sortedObservationsListForId, timestamp);
         }
 
-        private static ObservationResponse BinarySearchPreviousEvent(SortedList sortedObservationsList, Timestamp timestamp)
+        private static ObservationResponse BinarySearchPreviousEvent(SortedList<Timestamp, Observation> sortedObservationsList, Timestamp timestamp)
         {
             // Binary search through timestamps
             int mid;
@@ -84,13 +87,13 @@ namespace Timeline
             while (first <= last)
             {
                 mid = (first + last) / 2;
-                Timestamp middleTimestamp = (Timestamp)sortedObservationsList.GetKey(mid);
-                Observation middleObservation = (Observation)sortedObservationsList.GetByIndex(mid);
+                Timestamp middleTimestamp = sortedObservationsList.Keys[mid];
+                Observation middleObservation = sortedObservationsList.Values[mid];
 
                 if (timestamp.Value == middleTimestamp.Value)
                     return new ObservationResponse(middleObservation, null);
 
-                if (mid > 0) result = (Observation)sortedObservationsList.GetByIndex(mid - 1);
+                result = sortedObservationsList.Values[mid];
 
                 if (timestamp.Value < middleTimestamp.Value)
                     first = mid + 1;
