@@ -93,6 +93,11 @@ namespace Timeline.Operations
         {
             return new QuitOperation();
         }
+
+        public Operation GetUnknownOperation()
+        {
+            return new UnknownOperation();
+        }
         #endregion
 
 

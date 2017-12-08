@@ -25,8 +25,7 @@ namespace Timeline.Operations
                 if (operationType == OperationTypes.Quit) return _operationFactory.GetQuitOperation();
             }
 
-            //todo: (optionally) log invalid operation
-            return null;
+            return _operationFactory.GetUnknownOperation();
         }
     }
 }

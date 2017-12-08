@@ -12,5 +12,6 @@ namespace Timeline.Operations
         public static string Latest => "LATEST";
         public static string Quit => "QUIT";
         public static string Update => "UPDATE";
+        public static string Unknown => "UNKNOWN";
     }
 }
