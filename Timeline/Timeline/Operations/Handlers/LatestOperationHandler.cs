@@ -15,7 +15,7 @@ namespace Timeline.Operations.Handlers
                 return Response.ErrResponse($"The input provided for operation ({genericOperation.Type}) was invalid");
 
             if (!timeline.Data.ContainsKey(operation.Id))
-                return Response.ErrResponse($"Item ({operation.Id.Value}) doesn't exist.");
+                return Response.ErrResponse($"No history exists for identifier '{operation.Id.Value}'");
 
             var currentData = timeline.GetLatestObservationForId(operation.Id);
 

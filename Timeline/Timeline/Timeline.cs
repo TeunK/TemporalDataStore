@@ -19,7 +19,10 @@ namespace Timeline
         public void UpdateIdentity(Identifier id, Timestamp timestamp, Observation observation)
         {
             if (Data.ContainsKey(id))
-                Data[id].Add(timestamp, observation);
+                if (Data[id].ContainsKey(timestamp))
+                    Data[id][timestamp] = observation;
+                else
+                    Data[id].Add(timestamp, observation);
             else
                 throw new ArgumentException("id was not contained in timeline");
         }
@@ -58,7 +61,7 @@ namespace Timeline
             else throw new ArgumentException("id was not contained in timeline");
         }
 
-        public ObservationResponse GetLatestObservationForId(Identifier id)
+        public ObservationResponse GetLatestObservationForId(Identifier id, bool ignoreTimestamp = false)
         {
             if (!Data.ContainsKey(id))
                 return new ObservationResponse(null, $"No history exists for identifier '{id.Value}'");
@@ -68,7 +71,13 @@ namespace Timeline
             if (sortedObservationsListForId.Count == 0)
                 return new ObservationResponse(null, $"No history exists for identifier '{id.Value}'");
 
-            return new ObservationResponse(Data[id].Values[Data[id].Count - 1], null);
+            var latestObservationTimestamp = Data[id].Keys[Data[id].Count - 1].Value;
+            var latestObservationData = Data[id].Values[Data[id].Count - 1].Value;
+            Observation latestObservation = ignoreTimestamp 
+                ? new Observation(latestObservationData) 
+                : new Observation($"{latestObservationTimestamp} {latestObservationData}");
+
+            return new ObservationResponse(latestObservation, null);
         }
 
         public ObservationResponse GetPreviousObservationForId(Identifier id, Timestamp timestamp)

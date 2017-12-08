@@ -15,7 +15,7 @@ namespace Timeline.Operations.Handlers
                 return Response.ErrResponse($"The input provided for operation ({genericOperation.Type}) was invalid");
 
             if (timeline.Data.ContainsKey(operation.Id))
-                return Response.ErrResponse($"Item ({operation.Id.Value}) already exists");
+                return Response.ErrResponse($"A history already exists for identifier '{operation.Id.Value}'");
 
             timeline.AddNewIdentity(operation.Id, operation.Timestamp, operation.Data);
 
