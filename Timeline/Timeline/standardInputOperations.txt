@@ -1,0 +1,19 @@
+﻿CREATE 0      100  1.5
+UPDATE 0      105  1.6
+GET           0      100
+GET           0      110
+LATEST 0      
+LATEST        1
+CREATE 1      110           2.5
+CREATE        1      115           2.4
+UPDATE        1      115           2.4
+UPDATE        1      120           2.3
+UPDATE 1      125           2.2
+LATEST        1      
+GET    1      120
+UPDATE 1      120    2.35
+GET           1      122
+DELETE 1      122
+GET           1      125
+DELETE 1
+QUIT

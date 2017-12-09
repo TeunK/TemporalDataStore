@@ -25,9 +25,13 @@ namespace Timeline
                 {OperationTypes.Latest, genericOperation => new LatestOperationHandler().HandleOperation(genericOperation, ref timeline)},
             };
 
-            while (true)
+            string filePath = Path.Combine(Directory.GetCurrentDirectory(),"standardInputOperations.txt");
+            Console.WriteLine("\nReading from STDIN at "+filePath+"\n");
+
+            foreach (string line in File.ReadLines(filePath))
             {
-                var line = Console.ReadLine();
+                Console.WriteLine(line);
+
                 var genericOperation = operationParser.ParseOperation(line);
                 string response;
 
@@ -45,6 +49,8 @@ namespace Timeline
 
                 Console.WriteLine(response);
             }
+
+            Console.ReadKey();
         }
     }
 }
