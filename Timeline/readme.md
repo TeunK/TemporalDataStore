@@ -15,6 +15,10 @@ This is done by doing a (in-place) binary search through the sorted list. Lookin
 
 A result screenshot can be found included in `result.PNG`.
 
+I did not add any automated tests as this would be too time-consuming.
+However, on request, I will be more than happy to include these to the solution.
+(Testing was instead done manually)
+
 ### Rules
 
 ###### CREATE <id> <timestamp> <data>
