@@ -25,16 +25,15 @@ namespace Timeline
                 {OperationTypes.Latest, genericOperation => new LatestOperationHandler().HandleOperation(genericOperation, ref timeline)},
             };
 
-            string filePath = Path.Combine(Directory.GetCurrentDirectory(),"standardInputOperations.txt");
-            Console.WriteLine("\nReading from STDIN at "+filePath+"\n");
-
-            foreach (string line in File.ReadLines(filePath))
+            using (StreamReader reader = new StreamReader(Console.OpenStandardInput()))
+            using (StreamWriter writer = new StreamWriter(Console.OpenStandardOutput()))
+            while (true)
             {
-                Console.WriteLine(line);
+                string stdin = reader.ReadLine();
 
-                var genericOperation = operationParser.ParseOperation(line);
+                var genericOperation = operationParser.ParseOperation(stdin);
+
                 string response;
-
                 if (genericOperation == null)
                     response = Response.ErrResponse("Invalid input parameters provided");
                 else
@@ -46,11 +45,9 @@ namespace Timeline
                     else
                         response = Response.ErrResponse("Unknown request type");
                 }
-
                 Console.WriteLine(response);
+                writer.WriteLine(response);
             }
-
-            Console.ReadKey();
         }
     }
 }
