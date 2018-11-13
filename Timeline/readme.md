@@ -1,5 +1,5 @@
-# Duet Asset Management 
-Written by Teun kokke, in C# ASP.NET Core
+# Get Latest Element From Timeline
+Written in C# ASP.NET Core
 
 ### Structure
 The source code can be found inside the `\timeline` directory.
@@ -13,11 +13,9 @@ The function could be considered as a controller in common MVC patterns, and tak
 The `Timeline.cs` class is what stores the final data. The data can be considered to be in the format of a dictionary<Identifier, BinarySearchTree> with the tree containing Timestamp as key and Observation (data) as value. The tree is in reality a SortedList which keeps track of an array of data as well as the ordering (based on Timestamp as key). Most methods are rather straight-forward. The interesting bit is the way to find the previously-occurring timestamp given a particular timestap that may or may not exist on the timeline.
 This is done by doing a (in-place) binary search through the sorted list. Looking at where in the structure the given timestamp should be found. If not found, it simply returns whatever would be immediately on the left of it.
 
-A result screenshot can be found included in `result.PNG`.
+![result screenshot](https://github.com/TeunK/TemporalDataStore/blob/master/Timeline/Result.PNG?raw=true)
 
-I did not add any automated tests as this would be too time-consuming.
-However, on request, I will be more than happy to include these to the solution.
-(Testing was instead done manually)
+(Tests are not included)
 
 ### Rules
 
