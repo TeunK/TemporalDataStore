@@ -13,8 +13,6 @@ The function could be considered as a controller in common MVC patterns, and tak
 The `Timeline.cs` class is what stores the final data. The data can be considered to be in the format of a dictionary<Identifier, BinarySearchTree> with the tree containing Timestamp as key and Observation (data) as value. The tree is in reality a SortedList which keeps track of an array of data as well as the ordering (based on Timestamp as key). Most methods are rather straight-forward. The interesting bit is the way to find the previously-occurring timestamp given a particular timestap that may or may not exist on the timeline.
 This is done by doing a (in-place) binary search through the sorted list. Looking at where in the structure the given timestamp should be found. If not found, it simply returns whatever would be immediately on the left of it.
 
-![result screenshot](https://github.com/TeunK/TemporalDataStore/blob/master/Timeline/Result.PNG?raw=true)
-
 (Tests are not included)
 
 ### Rules
@@ -46,3 +44,10 @@ This is done by doing a (in-place) binary search through the sorted list. Lookin
 
 ###### QUIT
    - Terminates the process immediately. No response should be written. 
+   
+   
+   
+   
+#### RESULT
+![result screenshot](https://github.com/TeunK/TemporalDataStore/blob/master/Timeline/Result.PNG?raw=true)
+
